@@ -70,24 +70,58 @@ void free_list(listint_t *head)
  * @head: head of the list
  * Return: 0 if it is not a palindrome, 1 if it is a palindrome
  */
+/**
+ * is_palindrome - Checks whether the list is palindrome
+ * @head: head of the list
+ * Return: 0 if it is not a palindrome, 1 if it is a palindrome
+ */
 int is_palindrome(listint_t **head)
 {
-	listint_t *temp1, *temp2;
+	listint_t *slow = *head, *fast = *head;
+	int count = 0, i;
+	int *stack;
 
-	temp1 = *head;
-	temp2 = copy_list(temp1);
-	reverse_listint(&temp2);
-
-	while (temp2)
+	if (*head == NULL || (*head)->next == NULL)
 	{
-		if (temp1->n != temp2->n)
+		return (1);
+	}
+
+	while (fast && fast->next)
+	{
+		slow = slow->next;
+		fast = fast->next->next;
+		count++;
+	}
+
+	stack = malloc(sizeof(int) * count);
+
+	if (!stack)
+	{
+		return (0);
+	}
+
+	for (i = 0; i < count; i++)
+	{
+		stack[i] = (*head)->n;
+		*head = (*head)->next;
+	}
+
+	if (fast != NULL)
+	{
+		slow = slow->next;
+	}
+
+	while (slow)
+	{
+		if (slow->n != stack[--i])
 		{
-			free_list(temp2);
+			free(stack);
 			return (0);
 		}
-		temp1 = temp1->next;
-		temp2 = temp2->next;
+		slow = slow->next;
 	}
-	free_list(temp2);
+
+	free(stack);
 	return (1);
 }
+
